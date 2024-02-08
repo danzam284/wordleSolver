@@ -1,0 +1,13 @@
+{
+    "name": "Wordle Solver",
+    "manifest_version": 3,
+    "description": "Solves wordle games using a unique and efficient algorithm.",
+    "version": "2.0",
+    "action": {
+        "default_icon": "logo.png"
+    },
+    "background": {
+        "service_worker": "setup.js"
+    },
+    "permissions": ["scripting", "activeTab"]
+}
