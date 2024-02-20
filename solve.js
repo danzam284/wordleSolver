@@ -6,9 +6,9 @@ var inWord = {};                            //Key is int, value is letter (speci
 var outWord = {};                           //Key is letter, value is list (specifies each location that a letter cannot be)
 var mustInclude = "";                       //Used for yellow letters
 var round = 0;                              //Specifies the round
-var currentWord = "adieu";                  //Keeps track of last used word
+var currentWord = "clint";                  //Keeps track of last used word
 var finished = false;                       //Dictates whether game is still in play
-var started
+var startedWithNothing = false;
 
 const board = document.body.childNodes[5].shadowRoot.childNodes[3].childNodes[1].childNodes[3].childNodes[1].childNodes;
 
@@ -94,7 +94,7 @@ function updateInfo(prevRow) {
 }
 
 /* Uses all known info to pick a word which meets requirements */
-function getBestWord() {
+async function getBestWord() {
     let possible_words = [];
     let possible_words_bad = [];
     for (let i = 0; i < options.length; i++) {
@@ -126,9 +126,9 @@ function getBestWord() {
         }
     }
     if (possible_words.length) {
-        return frequencyAnalysis(possible_words);
+        return await getMostReleventWord(possible_words);
     } else {
-        return frequencyAnalysis(possible_words_bad);
+        return await getMostReleventWord(possible_words_bad);
     }
 }
 
@@ -139,7 +139,7 @@ async function go() {
     } else {
         updateInfo(round - 1);
         if (!finished) {
-            newWord = await getBestWord();
+            newWord = round === 1 && startedWithNothing ? "soare" : await getBestWord();
             await guess(newWord);
             currentWord = newWord;
         }
@@ -180,6 +180,29 @@ function frequencyAnalysis(words) {
     return bestWord;
 }
 
+/* Extracts data from a word relevance API */
+async function wordRelevance(word) {
+    const response = await fetch("https://api.datamuse.com/words?sp=" + word + "&md=f&max=1");
+    const data = await response.json();
+    if (data.length === 0) {
+        return Infinity;
+    }
+    return data[0].score;
+}
+
+/* Gets the most common word based on relevancy API */
+async function getMostReleventWord(words) {
+    let best = Infinity, bestWord = "";
+    for (let i = 0; i < words.length; i++) {
+        let curScore = await wordRelevance(words[i]);
+        if (curScore < best) {
+            best = curScore;
+            bestWord = words[i];
+        }
+    }
+    return bestWord;
+}
+
 /* Used to warn user if they leave the page due to unfixable async bug */
 document.addEventListener("visibilitychange", () => {
     if (!document.getElementById("warning") && !finished) {
@@ -204,6 +227,9 @@ document.addEventListener("visibilitychange", () => {
 /* Updates with any starting info if the board is prefilled and starts the algorithm */
 function start() {
     round = calculateRound();
+    if (round === 0) {
+        startedWithNothing = true;
+    }
     for (let i = 0; i < round - 1; i++) {
         updateInfo(i);
     }
