@@ -8,7 +8,7 @@ This is an extension which helps you to solve wordle puzzles on [Wordle Unlimite
 https://chromewebstore.google.com/detail/wordle-solver/dackgklclohfgkhkgcbffocblfinffla
 
 ## Features
-1. It has an insanely high success rate due to implementing frequency analysis into the word choice. On average, it takes 3-5 turns to find the word.
+1. It has an insanely high success rate due to implementing a word relevancy API into the word choice. On average, it takes 3-5 turns to find the word.
 2. Obviously it would be no fun to only use it once a day, so we made it also work on Wordle Unlimited so you can keep playing with it!
 3. The extension can pickup from where you left off so no need to always start from a blank board (it will process the whole board contents before starting).
 4. Sometimes the algorithm can break if you leave the tab, so we have a pop-up warning with instructions on how to continue if this happens with no harm to the game.
